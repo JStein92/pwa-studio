@@ -32,7 +32,6 @@ class MiniCart extends Component {
     };
 
     constructor(...args) {
-
         super(...args);
     }
 
@@ -50,8 +49,6 @@ class MiniCart extends Component {
         Checkout = CheckoutComponent;
         store.addReducer('checkout', checkoutReducer);
         store.addReducer('cart', await makeCartReducer());
-        const blojf;
-        blojf = 'kajsb';
         this.props.getCartDetails({
             guestCartId: store.getState().cart.guestCartId
         });
