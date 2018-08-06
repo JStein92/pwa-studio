@@ -7,9 +7,22 @@ const { fail, warn, markdown, danger } = require('danger');
 const prettierVersion = require('prettier/package.json').version;
 const eslintJUnitReporter = require('eslint/lib/formatters/junit');
 
-const reportDir = './test-results/';
-
 const fromRoot = p => path.relative('', p);
+
+const packageNames = {
+    'venia-concept': 'Venia',
+    'pwa-buildpack': 'Buildpack',
+    peregrine: 'Peregrine',
+    'pwa-devdocs': 'Developer Docs'
+};
+const pathToPackageName = filepath => {
+    const packageDir = path
+        .normalize(path.relative('packages', filepath))
+        .split(path.sep)[0];
+    return packageNames[packageDir] || packageDir;
+};
+
+const reportDir = './test-results/';
 const reportFile = name => {
     const subdir = path.join(reportDir, name);
     mkdirp.sync(subdir);
