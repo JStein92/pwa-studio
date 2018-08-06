@@ -15,20 +15,28 @@ const reportFile = name => {
     mkdirp.sync(subdir);
     return path.join(subdir, 'results.xml');
 };
+
 const fence = '```';
 const codeFence = str => `${fence}\n${str.trim()}\n${fence}`;
 
-const nsPerSec = 1e9;
-const formatTime = ([seconds, nanoseconds]) =>
-    (seconds + nanoseconds / nsPerSec).toFixed(3);
-const timer = () => {
+function timer() {
+    const msPerSec = 1e3;
+    const nsPerMillisec = 1e6;
+    const formatTime = ([seconds, nanoseconds]) =>
+        Math.round(seconds * msPerSec + nanoseconds / nsPerMillisec) / msPerSec;
     const startTime = process.hrtime();
-    let lapTime = startTime;
+    let lastLap = startTime;
     return {
-        lap: () => formatTime((lapTime = process.hrtime(lapTime))),
-        stop: () => formatTime(process.hrtime(startTime))
+        lap() {
+            const lapTime = process.hrtime(lastLap);
+            lastLap = process.hrtime();
+            return formatTime(lapTime);
+        },
+        stop() {
+            return formatTime(process.hrtime(startTime));
+        }
     };
-};
+}
 
 function jUnitSuite(title) {
     const stopwatch = timer();
@@ -208,8 +216,7 @@ const tasks = [
 
         const errFiles = results
             .filter(r => r.errorCount)
-            //.map(r => fromRoot(r.filePath));
-            .map(r => r.filePath);
+            .map(r => fromRoot(r.filePath));
 
         if (errFiles.length > 0) {
             fail(
