@@ -1,47 +1,20 @@
-import { Component, createElement } from 'react';
-import gql from 'graphql-tag';
-import { Query } from 'react-apollo';
-import classify from 'src/classify';
-import defaultClasses from './search.css';
+import { Fragment, Component, createElement } from 'react';
+import store from './store';
+import { Provider } from 'react-redux';
+import SearchBar from './searchBar';
+import SearchCategory from './searchCategory';
 
-const searchQuery = gql`
-query products($search: String) {
-  products(search: $search) {
-    items {
-      id
-      name
-    }
+export default class Search extends Component {
+  render() {
+    return (
+      <div>
+        <Provider store={store}>
+          <Fragment>
+            <SearchCategory />
+            <SearchBar />
+          </Fragment>
+        </Provider>
+      </div>
+    )
   }
 }
-`;
-
-
-class Search extends Component {
-
-    render() {
-        const { search } = this.props;
-        console.log(search);
-        return (
-            <Query query={searchQuery} variables={{search}}>
-                {({ loading, error, data }) => {
-                    if (error) return <div>Data Fetch Error</div>;
-                    if (loading) return <div>Fetching Data</div>;
-                    if (data.products.items.length == 0) return <div> No results </div>
-                    console.log(data);
-
-                    return (
-                        <div>
-                            {
-                                data.products.items.map((item) => {
-                                return <li key={item.id}>{ item.name } </li>
-                                })
-                            }
-                        </div>
-                    );
-                }}
-            </Query>
-        );
-    }
-}
-
-export default classify(defaultClasses)(Search);
